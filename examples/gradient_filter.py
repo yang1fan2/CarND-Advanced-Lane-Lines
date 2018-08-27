@@ -1,3 +1,5 @@
+import numpy as np
+import cv2
 class GradientFilter:
     def __init__(self, abs_ksize = 3, mag_ksize = 9, dir_ksize = 15, abs_thresh=(20,100),mag_thresh=(30,100),dir_thresh=(0.7,1.3), color_thresh=(170,255)):
         self.abs_ksize = abs_ksize

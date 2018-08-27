@@ -1,4 +1,5 @@
-
+import cv2
+import numpy as np
 class WindowSearcher:
     
     def __init__(self, nwindows = 9, margin = 125, minpix = 50):
@@ -83,11 +84,32 @@ class WindowSearcher:
         righty = nonzeroy[right_lane_inds]
 
         return leftx, lefty, rightx, righty, out_img
+    
+    def find_using_prior_fit(self, binary_warped, left_fit, right_fit):
+        nonzero = binary_warped.nonzero()
+        nonzeroy = np.array(nonzero[0])
+        nonzerox = np.array(nonzero[1])
+        left_lane_inds = ((nonzerox > (left_fit[0]*(nonzeroy**2) + left_fit[1]*nonzeroy + 
+                        left_fit[2] - self.margin)) & (nonzerox < (left_fit[0]*(nonzeroy**2) + 
+                        left_fit[1]*nonzeroy + left_fit[2] + self.margin)))
+        right_lane_inds = ((nonzerox > (right_fit[0]*(nonzeroy**2) + right_fit[1]*nonzeroy + 
+                        right_fit[2] - self.margin)) & (nonzerox < (right_fit[0]*(nonzeroy**2) + 
+                        right_fit[1]*nonzeroy + right_fit[2] + self.margin)))
 
+        # Again, extract left and right line pixel positions
+        leftx = nonzerox[left_lane_inds]
+        lefty = nonzeroy[left_lane_inds] 
+        rightx = nonzerox[right_lane_inds]
+        righty = nonzeroy[right_lane_inds]  
+        out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
+        return leftx, lefty, rightx, righty, out_img
 
-    def fit_polynomial(self, binary_warped):
+    def fit_polynomial(self, binary_warped, left_fit =None, right_fit=None):
         # Find our lane pixels first
-        leftx, lefty, rightx, righty, out_img = self.find_lane_pixels(binary_warped)
+        if left_fit != None and right_fit !=None:
+            leftx, lefty, rightx, righty, out_img = self.find_using_prior_fit(binary_warped, left_fit, right_fit)
+        else:
+            leftx, lefty, rightx, righty, out_img = self.find_lane_pixels(binary_warped)
 
         left_fit = np.polyfit(lefty, leftx, 2)
         right_fit = np.polyfit(righty, rightx, 2)
@@ -112,9 +134,10 @@ class WindowSearcher:
 #         plt.plot(left_fitx, ploty, color='yellow')
 #         plt.plot(right_fitx, ploty, color='yellow')
         for idx in range(ploty.shape[0]):
-            out_img[int(ploty[idx]), int(left_fitx[idx]),:] = [0, 255, 255]
-            out_img[int(ploty[idx]), int(right_fitx[idx]),:] = [0, 255, 255]
-            
+            out_img[int(ploty[idx]), min(int(left_fitx[idx]), self.width-1),:] = [0, 255, 255]
+            out_img[int(ploty[idx]), min(int(right_fitx[idx]), self.width-1),:] = [0, 255, 255]
+        self.left_fitx = left_fitx
+        self.right_fitx = right_fitx
         self.ploty = ploty
         self.left_fit = left_fit
         self.right_fit = right_fit            
@@ -138,4 +161,4 @@ class WindowSearcher:
         return left_curverad, right_curverad    
 
     def measure_center(self):
-        return (self.width / 2.0 - (self.leftx_base + self.rightx_base) / 2.0) * self.xm_per_pix
+        return (self.width / 2.0 - (self.left_fitx[-1] + self.right_fitx[-1]) / 2.0) * self.xm_per_pix
