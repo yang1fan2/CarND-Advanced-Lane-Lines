@@ -1,14 +1,15 @@
 import cv2
+import numpy as np
 
 
 class Warper:
     def __init__(self, img_size):
         self.img_size = img_size
         self.src = np.float32(
-            [[(img_size[1] / 2) - 55, img_size[0] / 2 + 100],
+            [[(img_size[1] / 2) - 55, img_size[0] / 2 + 125],
             [((img_size[1] / 6) - 10), img_size[0]],
             [(img_size[1] * 5 / 6) + 60, img_size[0]],
-            [(img_size[1] / 2 + 55), img_size[0] / 2 + 100]])
+            [(img_size[1] / 2 + 65), img_size[0] / 2 + 125]])
         self.dst = np.float32(
             [[(img_size[1] / 4), 0],
             [(img_size[1] / 4), img_size[0]],
