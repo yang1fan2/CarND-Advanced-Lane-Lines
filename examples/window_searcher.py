@@ -134,8 +134,10 @@ class WindowSearcher:
 #         plt.plot(left_fitx, ploty, color='yellow')
 #         plt.plot(right_fitx, ploty, color='yellow')
         for idx in range(ploty.shape[0]):
-            out_img[int(ploty[idx]), max(0,min(int(left_fitx[idx]), self.width-1)),:] = [0, 255, 255]
-            out_img[int(ploty[idx]), max(0,min(int(right_fitx[idx]), self.width-1)),:] = [0, 255, 255]
+
+        out_img[int(ploty[idx]), max(0,min(int(left_fitx[idx]), self.width-1)),:] = [0, 255, 255]
+        out_img[int(ploty[idx]), max(0,min(int(right_fitx[idx]), self.width-1)),:] = [0, 255, 255]
+
         self.left_fitx = left_fitx
         self.right_fitx = right_fitx
         self.ploty = ploty
