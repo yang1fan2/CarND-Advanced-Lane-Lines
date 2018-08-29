@@ -110,10 +110,12 @@ class WindowSearcher:
             leftx, lefty, rightx, righty, out_img = self.find_using_prior_fit(binary_warped, left_fit, right_fit)
         else:
             leftx, lefty, rightx, righty, out_img = self.find_lane_pixels(binary_warped)
-
-        left_fit = np.polyfit(lefty, leftx, 2)
-        right_fit = np.polyfit(righty, rightx, 2)
-
+        try:
+            left_fit = np.polyfit(lefty, leftx, 2)
+            right_fit = np.polyfit(righty, rightx, 2)
+        except:
+            left_fit = np.array([0,0,0])
+            right_fit = np.array([1,1,1])
         # Generate x and y values for plotting
         ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
         try:
@@ -135,8 +137,8 @@ class WindowSearcher:
 #         plt.plot(right_fitx, ploty, color='yellow')
         for idx in range(ploty.shape[0]):
 
-        out_img[int(ploty[idx]), max(0,min(int(left_fitx[idx]), self.width-1)),:] = [0, 255, 255]
-        out_img[int(ploty[idx]), max(0,min(int(right_fitx[idx]), self.width-1)),:] = [0, 255, 255]
+            out_img[int(ploty[idx]), max(0,min(int(left_fitx[idx]), self.width-1)),:] = [0, 255, 255]
+            out_img[int(ploty[idx]), max(0,min(int(right_fitx[idx]), self.width-1)),:] = [0, 255, 255]
 
         self.left_fitx = left_fitx
         self.right_fitx = right_fitx

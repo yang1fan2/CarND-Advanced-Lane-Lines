@@ -30,7 +30,7 @@ class Line:
         self.recent_xfitted.append(fit)
         self.current_fit = fit
         
-        self.best_fit = np.array(self.recent_xfitted[-5:]).mean(axis=0)
+        self.best_fit = np.array(self.recent_xfitted[-self.n_iters:]).mean(axis=0)
         self.ally = ploty
         self.allx = self.best_fit[0]*ploty**2 + self.best_fit[1]*ploty + self.best_fit[2]
         

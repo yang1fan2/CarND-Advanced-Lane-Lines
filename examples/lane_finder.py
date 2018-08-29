@@ -20,7 +20,7 @@ class LaneFinder:
         self.binary = self.gradient_filter.process(dst)
     #    cv2.imwrite('../output_images/gradient_filter/filter_' + file_name, binary.astype('uint8') * 255)
 
-        cv2.imwrite('../output_images/debug/binary_%d.png' % self.cnt, self.binary.astype('uint8') * 255)
+#        cv2.imwrite('../output_images/debug/binary_%d.png' % self.cnt, self.binary.astype('uint8') * 255)
         #cv2.polylines(img, [np.int32(warper.src.reshape(-1,1,2))], True,(0,0,255), 3)
         #cv2.imwrite('../output_images/warped/src_' + file_name, img)
     #     warped = warper.warp(img)
@@ -28,10 +28,10 @@ class LaneFinder:
     #     cv2.imwrite('../output_images/warped/dst_' + file_name, warped)
 
         self.warped = self.warper.warp(self.binary)
-        cv2.imwrite('../output_images/debug/warped_%d.png' % self.cnt, self.warped.astype('uint8') * 255)        
+ #       cv2.imwrite('../output_images/debug/warped_%d.png' % self.cnt, self.warped.astype('uint8') * 255)        
     #    cv2.imwrite('../output_images/warped/dst_binary_' + file_name, warped.astype('uint8') * 255)
         out_img = self.window_searcher.fit_polynomial(self.warped, left_fit, right_fit)
-        cv2.imwrite('../output_images/debug/out_%d.png' % self.cnt, out_img)
+  #      cv2.imwrite('../output_images/debug/out_%d.png' % self.cnt, out_img)
     #    cv2.imwrite('../output_images/window_search/' + file_name, out_img)
     #    unwarped = warper.unwarp(out_img)
     #    cv2.imwrite('../output_images/unwarped/' + file_name, unwarped)

@@ -14,11 +14,11 @@ n_skipped_frames = 0
 
 def sanity_check(lane_finder):
     curs = lane_finder.window_searcher.measure_curvature_real()
-    if abs(curs[0] - curs[1])> 2000:
+    if abs(curs[0] - curs[1])> 4000:
         print(curs)
         return False
     errors = (lane_finder.window_searcher.right_fitx - lane_finder.window_searcher.left_fitx).mean()
-    if errors > 800 or errors < 400:
+    if errors > 1000 or errors < 200:
         print(errors)
         return False
     return True
@@ -26,7 +26,7 @@ def sanity_check(lane_finder):
 def process_image(image):
     global n_skipped_frames
     if n_skipped_frames <= 5:
-        lane_finder.run_pipeline(image, left_line.best_fit, right_line.best_fit)
+        lane_finder.run_pipeline(image, None,None)#
     else:
         lane_finder.run_pipeline(image)            
     if sanity_check(lane_finder) == True or left_line.best_fit == None:
@@ -43,6 +43,6 @@ def process_image(image):
 if __name__ == '__main__':
     
     
-    clip1 = VideoFileClip("../challenge_video.mp4")#.subclip(24, 26)
+    clip1 = VideoFileClip("../harder_challenge_video.mp4")#.subclip(2, 5)
     white_clip = clip1.fl_image(process_image) 
-    white_clip.write_videofile('../output_videos/challenge_video.mp4', audio=False)
+    white_clip.write_videofile('../output_videos/harder_challenge_video.mp4', audio=False)
