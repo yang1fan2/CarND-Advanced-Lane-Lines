@@ -45,7 +45,7 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 
 #### 1. Provide an example of a distortion-corrected image.
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
+I use learned distortion-corrected matrix and get the following image:
 ![alt text][image1]
 Other undistorted images can be found in [folder](https://github.com/yang1fan2/CarND-Advanced-Lane-Lines/tree/master/output_images/undistort_images)
 
