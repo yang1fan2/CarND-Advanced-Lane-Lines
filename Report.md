@@ -20,13 +20,13 @@ The goals / steps of this project are the following:
 [image2]: ./output_images/gradient_filter/filter_straight_lines2.jpg "Gradient filter"
 [image3]: ./output_images/warped/src_challenge0.jpg "Before warping"
 [image4]: ./output_images/warped/dst_challenge0.jpg "After warping"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
+[image5]: ./output_images/window_search/straight_lines2.jpg "Window Search"
+[image6]: ./output_images/final/challenge12.jpg "Final"
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
-### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
+### Here I consider the rubric points individually and describe how I addressed each point in my implementation.  
 
 ---
 
@@ -92,17 +92,18 @@ I verified that my perspective transform was working as expected by drawing the 
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+I used both sliding window search ([code](https://github.com/yang1fan2/CarND-Advanced-Lane-Lines/blob/master/examples/window_searcher.py#L30)) and search from previous polynomial([code](https://github.com/yang1fan2/CarND-Advanced-Lane-Lines/blob/master/examples/window_searcher.py#L89)). For sliding window search, I first found two base points with the maximum histogram values. Then starting from bottom to top, collect pixels with a given margin. As for searching from prior, I searched the pixels near the previous lanes.
+
+At last I fit my lane lines with a 2nd order polynomial with np.polyfit. The following image shows the detected lanes:
 
 ![alt text][image5]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
-
-I did this in lines # through # in my code in `my_other_file.py`
+I calculate the radius of curvature in [here](https://github.com/yang1fan2/CarND-Advanced-Lane-Lines/blob/master/examples/window_searcher.py#L150) and the position of the vehicle with respect to center [here](https://github.com/yang1fan2/CarND-Advanced-Lane-Lines/blob/master/examples/window_searcher.py#L167).
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I implemented this step in [code](https://github.com/yang1fan2/CarND-Advanced-Lane-Lines/blob/master/examples/lane_finder.py#L42). Here is an example of my result on a test image: 
 
 ![alt text][image6]
 
@@ -110,9 +111,7 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 ### Pipeline (video)
 
-#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
-
-Here's a [link to my video result](./project_video.mp4)
+Here's a [project_video](./output_videos/project_video.mp4), [challenge_video](./output_videos/challenge_video.mp4), [harder_challenge_video](./output_videos/harder_challenge_video.mp4).
 
 ---
 
@@ -120,4 +119,7 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+- I spent a lot of time tuning the thresholds of the binary images. Firstly, I tried my best to reduce the noise. Otherwise, it will fail to fit the polynomial during the following steps. Secondly, in the challenge video, it's hard to only detect the yellow lanes without introducing the edges next to the yellow lanes. I solved the problem by using HLS color space.
+- Searching from previous polynomial usually has better performance than sliding window search, especially if there are noises. It can directly ignore the noises by only focusing on a small area.
+- The most important tricks is smoothing ([code](https://github.com/yang1fan2/CarND-Advanced-Lane-Lines/blob/master/examples/line.py#L33)) and sanity check ([code](https://github.com/yang1fan2/CarND-Advanced-Lane-Lines/blob/master/examples/main.py#L15)). I averaged the fitted parameters of the last five iterations. If one of the frames has bad detected lanes, smoothing can correct the error. Moreover, sanity check prevent adding bad frames into my smoothing array. I used two rules: the radius of curvature of left lane and right lane should be similar; The distance between left lane and right lane should be reasonable.
+- The algorithm doesn't do well in harder_challenge_video. There are several reasons. In some frames, the sunlight is too strong, we cannot see anything. We should use different thresholds or use a more advanced filters. Secondly, the left yellow lane is pretty clear, while the right white lanes are covered by dust or leaves. In this case, we can only detect the left lane and infer the right lane. As last, the road has many turns. We should have a more robust area of interest, instead of hard-coding the area.
